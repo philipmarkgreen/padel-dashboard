@@ -80,16 +80,18 @@ for _, row in data.iterrows():
 
 # --- 4. BUILD LEADERBOARD ---
 latest_match = data['Date'].max()
-cutoff_date = latest_match - timedelta(days=90)
+cutoff_date = latest_match - timedelta(days=90) # This is your 3-month window
 
 leaderboard_data = []
 for name, rating in players.items():
+    # Only include players who have a rating sigma < 4.5 (reliable data) 
+    # AND who have played within the last 90 days
     if rating.sigma < 4.5 and last_played.get(name, datetime.min) >= cutoff_date:
         cons_skill = rating.mu - (3 * rating.sigma)
         win_pct = (stats[name]["W"] / stats[name]["Played"]) * 100
         record = f"{stats[name]['W']}W - {stats[name]['L']}L - {stats[name]['T']}T"
         leaderboard_data.append({"Player": name, "Score": round(cons_skill, 2), "Win Rate %": round(win_pct, 1), "Record": record})
-
+        
 df_leaderboard = pd.DataFrame(leaderboard_data).sort_values(by="Score", ascending=False).reset_index(drop=True)
 df_leaderboard.index += 1
 
