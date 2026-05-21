@@ -16,8 +16,17 @@ SHEET_URL = "https://drive.google.com/uc?id=11PQwt067rRYyQtIW2ZuJFveHncq2hBP1&ex
 def load_data():
     df = pd.read_csv(SHEET_URL)
     df = df.dropna(subset=['Team 1A', 'Team 1B', 'Team 2A', 'Team 2B', 'Result'])
-    df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d', errors='coerce')
-    return df.sort_values(by='Date')
+    df['Date'] = pd.to_datetime(df['Date'], dayfirst=False, errors='coerce')
+    
+    # --- AUTOMATIC ROUND NUMBERING (Fixed) ---
+    # 1. Assign rounds first! This relies on the original top-to-bottom CSV order.
+    df['Round'] = df.groupby('Date').cumcount() + 1
+    
+    # 2. NOW sort by Date AND Round. This guarantees the chronological sequence 
+    # is mathematically locked in place forever.
+    df = df.sort_values(by=['Date', 'Round'])
+    
+    return df
 
 data = load_data()
 
