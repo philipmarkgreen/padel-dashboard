@@ -9,7 +9,7 @@ st.set_page_config(page_title="Makeni Padel Leaderboard", page_icon="🎾", layo
 st.title("🏆 Makeni Padel TrueSkill Rankings")
 
 # This link pulls your Google Sheet data live
-SHEET_URL = "https://drive.google.com/uc?id=11PQwt067rRYyQtIW2ZuJFveHncq2hBP1&export=download"
+SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4T2HqnoW1RxaYmW_FXX2NIoI-h03inlqO1rlXHcHah1vze_dKw1tP-NX8CS957dt42AwmgzsgDjtI/pub?output=csv"
 
 # --- 2. DATA LOADING ---
 @st.cache_data(ttl=600)
