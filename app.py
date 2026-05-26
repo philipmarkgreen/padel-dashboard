@@ -108,8 +108,9 @@ df_leaderboard.index += 1
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    st.subheader(f"Active Roster (As of {latest_match.strftime('%b %d, %Y')})")
-    st.dataframe(df_leaderboard, width="stretch") 
+    st.subheader(f"Top 10 Active Players (As of {latest_match.strftime('%b %d, %Y')})")
+    # Add .head(10) to slice the table for the top 10 players only!
+    st.dataframe(df_leaderboard.head(10), width="stretch")
 
 with col2:
     st.subheader("Match Simulator")
