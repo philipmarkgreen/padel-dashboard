@@ -126,3 +126,47 @@ with col2:
         prob_A = 1 / (1 + 10**((avg_B - avg_A) / 8))
         st.metric("Team A Win Prob", f"{prob_A * 100:.1f}%")
         st.metric("Team B Win Prob", f"{(1 - prob_A) * 100:.1f}%")
+
+    st.divider()
+    st.subheader("Tonight's Pairings Generator")
+    players_input = st.text_area(
+        "Paste tonight's players (comma separated)", 
+        "Marc, Clyde, Kurt, Owen, Mike W, Terry, Phil, Nic M"
+    )
+    
+    if st.button("Generate Fair Teams"):
+        raw_names = [n.strip() for n in players_input.split(',')]
+        valid_players = []
+        
+        # Match names to the leaderboard
+        for n in raw_names:
+            cleaned = clean_name(n)
+            if cleaned in df_leaderboard['Player'].values:
+                # Get their conservative score from the leaderboard
+                score = df_leaderboard[df_leaderboard['Player'] == cleaned]['Score'].values[0]
+                valid_players.append((cleaned, score))
+            elif n: # If they typed a name that isn't in the system
+                st.warning(f"⚠️ Player '{n}' not found in active rankings. Check spelling.")
+                
+        # Make sure we have an even number of players for teams of 2
+        if len(valid_players) % 2 != 0:
+            st.error(f"You entered {len(valid_players)} valid players. We need an even number to make teams!")
+        elif len(valid_players) > 0:
+            # Sort players by score, highest to lowest
+            valid_players.sort(key=lambda x: x[1], reverse=True)
+            
+            # Snake Draft: Pair highest with lowest
+            teams = []
+            n_teams = len(valid_players) // 2
+            for i in range(n_teams):
+                p1 = valid_players[i]
+                p2 = valid_players[len(valid_players) - 1 - i]
+                teams.append({
+                    "name": f"Team {chr(65+i)}", # Team A, Team B, etc.
+                    "p1": p1[0], "p2": p2[0],
+                    "score": p1[1] + p2[1]
+                })
+                
+            st.success("✅ **Optimal Pairings Generated:**")
+            for t in teams:
+                st.markdown(f"**{t['name']}**: {t['p1']} & {t['p2']} *(Combined Score: {t['score']:.1f})*")
